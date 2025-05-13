@@ -1,56 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
 import './App.css'
 import Conversor from './conversor'
 
 function App() {
-const [usuario, setUsuario] = useState("")
-const [contraseña, setContraseña] = useState("")
+  const [usuario, setUsuario] = useState("")
+  const [contraseña, setContraseña] = useState("")
+  const [logueado, setLogueado] = useState(false)
 
-const [logueado, setLogueado] = useState(false)
-
-
-
-
-function cambiarUsuario (evento) {
-  setUsuario(evento.target.value)
-  
-}
-function cambiarContraseña(evento) {
-  setContraseña(evento.target.value)
-}
-function iniciarsesion() {
-  alert("iniciando sesion...")
-  if (usuario === "admin" && contraseña === "admin") {
-    alert("Ingresaste")
-    setLogueado(true)
-  } else {
-    alert("usuario o contraseña incorrectos")
+  function cambiarUsuario(evento) {
+    setUsuario(evento.target.value)
   }
-  
-}
 
-  
- 
+  function cambiarContraseña(evento) {
+    setContraseña(evento.target.value)
+  }
 
-if (logueado) {
- return <Conversor />
-  
-}
-  
+  async function iniciarsesion() {
+
+    const response = await fetch('http://localhost:3000/login?usuario=' + usuario + '&contraseña=' + contraseña, {
+      credentials: 'include',
+    })
+
+    if (response.ok) {
+      setLogueado(true)
+    } else {
+      alert('Usuario o clave incorrecta')
+    }
+  }
+
+  async function validar() {
+    const response = await fetch('http://localhost:3000/validar', {
+      credentials: 'include',
+    })
+
+
+    if (response.ok) {
+      setLogueado(true)
+    } else {
+      alert('Usuario o clave incorrecta')
+    }
+
+  }
+  useEffect(()=>{
+    validar()
+  },[])
+
+
+  if (logueado) {
+    return <Conversor />
+  }
+
   return (
     <>
-    <h1>Inicio sesion</h1>
-     <input placeholder="usuario" id="usuario" value={usuario} onChange={cambiarUsuario}/>
-     <input placeholder="contraseña" id="contraseña" value={contraseña} onChange={cambiarContraseña} />
-     <button onClick={iniciarsesion}>iniciar sesion</button>
-   
-     
-     
-     
+      <h1>Inicio sesión</h1>
+      <input placeholder='usuario' type="text" value={usuario} onChange={cambiarUsuario} />
+      <input placeholder="contraseña" type="password" value={contraseña} onChange={cambiarContraseña} />
+      <button onClick={iniciarsesion}>Iniciar sesión</button>
     </>
   )
 }
 
 export default App
+
